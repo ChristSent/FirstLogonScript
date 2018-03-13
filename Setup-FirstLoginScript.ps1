@@ -1,17 +1,21 @@
 ﻿ Param(
-   [string]$ScriptPath
+    [Parameter(Mandatory=$true)]
+    [string]$ScriptPath,
+    [Parameter(Mandatory=$true)]
+    [string]$ScriptName,
+    [Parameter(Mandatory=$true,ParameterSetName="powershell")]
+    [switch]$powershell,
+    [Parameter(Mandatory=$true,ParameterSetName="batch")]
+    [switch]$batch
 )
-
-
-
-if(-not($scriptPath)) { 
-    Throw "You must supply a fully qualified path to your script."
-    exit
-}
 
 if(-not(Test-Path $ScriptPath)) { 
     Throw "The path you specified was invalid."
     exit
+}
+
+if($powershell) {
+    $ScriptPath = 'C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe -executionPolicy Bypass -File ' + $ScriptPath
 }
 
 # Get the ID and security principal of the current user account
@@ -34,7 +38,9 @@ if (-not $myWindowsPrincipal.IsInRole($adminRole)) {
     Throw "You must run powershell as administrator before running this script"
 }
 
- 
 REG LOAD HKU\TEMP "C:\Users\Default\ntuser.dat"
-REG ADD HKU\TEMP\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v NewRegKey /t REG_SZ /d $ScriptPath /f
+REG ADD HKU\TEMP\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v $ScriptName /t REG_SZ /d $ScriptPath /f
 REG UNLOAD HKU\TEMP
+
+#Run garbage collection to close open handle to the registry.
+[gc]::Collect()
