@@ -3,4 +3,7 @@ This script utilizes Microsoft's Built-In RunOnce functionality to setup a scrip
 Instructions:
 1. Run powershell as administrator
 2. Run:
-PS> Setup-FirstLogonScript. ps1 <full-path-to.script>
+PS> Setup-FirstLogonScript.ps1 -ScriptPath <full-path-to.script> -ScriptName <Nickname for Script> -powershell or -bash
+
+
+Either choose -powershell or -bash depending on what type os script your adding.
